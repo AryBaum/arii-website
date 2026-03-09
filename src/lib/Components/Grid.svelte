@@ -7,7 +7,7 @@
     import rightArrow from '../assets/rightArrow.png';
     import RushHourGif from '../assets/RushHour3.gif';
     import PunchInGif from '../assets/PunchIn3.gif';
-    import AboutMiiGif from '../assets/AboutMii3.gif';
+    import AboutMiiGif from '../assets/AboutMii.gif';
     import SliderGif from '../assets/Slider.gif';
     import LoadingGif from '../assets/LoadingIcon.gif';
     import DontDieGif from '../assets/DontDie.gif';
