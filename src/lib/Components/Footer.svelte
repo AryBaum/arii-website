@@ -1,5 +1,7 @@
 <script>
     import { onMount } from 'svelte';
+    
+    import MailBtn from '../assets/MailLogo.png';
 
     let date = new Date();
     let mounted = false;
@@ -12,7 +14,10 @@
         return () => clearInterval(interval);
     });
 
-    $: dateString = `${date.getHours() % 12 || 12}:${date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}  \t\t ${date.toLocaleDateString('en-US', { weekday: 'short' })} ${date.getDate()}/${date.getMonth() + 1}`
+    // $: dateString = `${date.getHours() % 12 || 12}:${date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}  \t\t ${date.toLocaleDateString('en-US', { weekday: 'short' })} ${date.getDate()}/${date.getMonth() + 1}`
+    $: timeString = `${date.getHours() % 12 || 12}:${date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes()}`
+    $: period = `${date.getHours() >= 12 ? 'PM' : 'AM'}`
+    $: dayString = `${date.toLocaleDateString('en-US', { weekday: 'short' })} ${date.getDate()}/${date.getMonth() + 1}`
 </script>
 
 <div class="footer-wrap">
@@ -33,11 +38,14 @@
   </svg>
 
     <div class="footer-content">
+      <button class="btn left-15"><img src="AriiLogo.png" alt="Arii"></button>
+
         {#if mounted}
-            <span class="time">{dateString}</span>
+            <span class="time">{timeString} <span class="text-2xl pr-10">{period} </span>{dayString}</span>
         {:else}
             <span class="time" style="opacity:0">00:00 Mon 01/01</span>
         {/if}
+      <button class="btn right-15"><img src={MailBtn} alt="Mail"></button>
     </div>
 </div>
 
@@ -71,7 +79,9 @@
     z-index: 20; /* Must be higher than footer-svg z-index */
     text-align: center;
     color: #6c6c6c;
-    margin-top: 80px; /* Pushes text down into the "meat" of the trapezoid */
+    margin-top: 55px; /* Pushes text down into the "meat" of the trapezoid */
+    display: flex;
+    justify-content: space-between;
   }
 
   .time {
@@ -80,6 +90,7 @@
     line-height: 1;
     display: block;
     text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    margin-top: 30px;
   }
 
   .trapezoid-fill {
@@ -105,5 +116,12 @@
           drop-shadow(x-offset y-offset blur-radius color)
     */
     filter: drop-shadow(0px 10px 8px rgba(0, 0, 0, 0.801));
+  }
+
+  .btn {
+     width: 110px;
+     margin-bottom: 50px;
+     position: relative;
+     bottom: 25px;
   }
 </style>

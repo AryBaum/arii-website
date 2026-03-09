@@ -1,14 +1,26 @@
 <script>
     import App from './App.svelte';
+    import Popup from './Popup.svelte';
     import { fly } from 'svelte/transition';
     import { cubicOut } from 'svelte/easing';
     import leftArrow from '../assets/leftArrow.png';
     import rightArrow from '../assets/rightArrow.png';
-    import RushHourGif from '../assets/RushHour.gif';
-
+    import RushHourGif from '../assets/RushHour3.gif';
+    import PunchInGif from '../assets/PunchIn3.gif';
+    import AboutMiiGif from '../assets/AboutMii3.gif';
+    import SliderGif from '../assets/Slider.gif';
+    import LoadingGif from '../assets/LoadingIcon.gif';
+    import DontDieGif from '../assets/DontDie.gif';
+    import ResumeGif from '../assets/Resume.gif';
 
     const realApps = [
-        { id: 1, name: "Rush Hour", gif: RushHourGif}
+        { id: 1, name: "Rush Hour", gif: RushHourGif, link:"", description:""},
+        {id: 2, name: "Punch-In", gif: PunchInGif, link:"", description:"" },
+        {id: 3, name: "About Mii", gif: AboutMiiGif, link:"", description:""},
+        {id: 4, name: "Slider", gif: SliderGif, link:"", description:""},
+        {id: 5, name: "Loading Icon", gif: LoadingGif, link:"", description:""},
+        {id: 6, name: "Don't Die", gif: DontDieGif, link:"", description:""},
+        {id: 7, name: "Resume", gif: ResumeGif, link:"", description:""}
     ];
 
     // 2. Create a full list of 24
@@ -21,6 +33,31 @@
       gif: null // No GIF for placeholders
     };
   });
+
+    let selectedAppIndex = -1;
+
+    function openPopup(index) {
+        //Only open if not placeholder
+        if(allApps[index].name !== "Coming Soon") selectedAppIndex = index;
+    }
+
+    function closePopup() {
+        selectedAppIndex = -1;
+    }
+
+    function nextPopupApp() {
+        if (selectedAppIndex !== -1) {
+            // arithmetic to wrap around to 0 at end
+            selectedAppIndex = (selectedAppIndex + 1) % allApps.length;
+        }
+    }
+
+    function prevPopupApp() {
+        if (selectedAppIndex !== -1) {
+            selectedAppIndex = (selectedAppIndex - 1 + allApps.length) % allApps.length;
+        }
+    }
+
   
     let innerWidth = 1;
     let currentPage = 0;
@@ -62,15 +99,17 @@
     <div class="grid-viewport">
         {#key currentPage}
         <div class="grid-layout" in:fly={{ x: 100 * direction, duration:500, easing: cubicOut }} out:fly={{ x: -100 * direction, duration:500, easing: cubicOut }} style="grid-template-columns: repeat({columns}, 1fr); grid-template-rows: repeat({rows}, 1fr);">
-            {#each visibleApps as app}
+            {#each visibleApps as app, i}
                 <div class="grid-cell">
-                    <App appData={app} />
+                    <App appData={app} on:click={() => openPopup((currentPage * itemsPerPage)+i)}/>
                 </div>
             {/each}
         </div>
         {/key}
     </div>
-
+    {#if selectedAppIndex != -1}
+        <Popup app={allApps[selectedAppIndex]} on:close={closePopup} on:next={nextPopupApp} on:prev={prevPopupApp}></Popup>
+    {/if}
     <button class="arrow-btn right" on:click={nextPage} disabled={currentPage === totalPages - 1}><img src={rightArrow} alt="->"></button>
 </div>
 

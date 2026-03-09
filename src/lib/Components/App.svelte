@@ -1,10 +1,8 @@
 <script>
     export let appData;
-
-    const placeholderGif = "";
 </script>
 
-<div class="app-wrapper">
+<div class="app-wrapper" on:click>
     <div class="app-card" class:is-placeholder={!appData.gif}>
         {#if appData.gif}
             <img src={appData.gif} alt={appData.name} class="app-gif" loading="lazy" />
@@ -32,19 +30,19 @@
         height: 100%;
         background: linear-gradient(to bottom, #ededed, #c9c9c9);
         border-radius: 17px;
-        border: 3px solid;
-        border-color: lightgray;
+        border: 2.5px solid;
+        border-color: rgb(177, 177, 177);
         box-sizing: border-box;
         box-shadow: 0;
-        transition: box-shadow 0.7s ease;
-        transition: border-color 0.7s ease;
+        transition: box-shadow 0.9s ease;
+        transition: border-color 0.4s ease;
         overflow: hidden;
 
     }
 
     .app-wrapper:hover .app-card {
-        border-color: aqua;
-        box-shadow: 0 0 5px 3px aqua;
+        box-shadow: 0 0 5px 3px #58cdf8;
+        border-color: #58cdf8;
     }
 
     .tooltip {
@@ -83,7 +81,7 @@
 
     .placeholder-content {
         text-align: center;
-        color: black;
+        color: grey;
         font-family: sans-serif;
     }
 </style>
