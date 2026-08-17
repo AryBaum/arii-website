@@ -3,6 +3,9 @@
     import Popup from './Popup.svelte';
     import { fly } from 'svelte/transition';
     import { cubicOut } from 'svelte/easing';
+    import { playSound } from '$lib/sound.js';
+    import selectSfx from '$lib/assets/sfx/Select.wav';
+    import openSfx from '$lib/assets/sfx/Open.wav';
     import leftArrow from '../assets/leftArrow.png';
     import rightArrow from '../assets/rightArrow.png';
     import RushHourGif from '../assets/RushHour3.gif';
@@ -14,31 +17,32 @@
     import ResumeGif from '../assets/Resume.gif';
 
     const realApps = [
-        { id: 1, name: "Rush Hour", gif: RushHourGif, link:"", description:""},
-        {id: 2, name: "Punch-In", gif: PunchInGif, link:"", description:"" },
-        {id: 3, name: "About Mii", gif: AboutMiiGif, link:"", description:""},
-        {id: 4, name: "Slider", gif: SliderGif, link:"", description:""},
-        {id: 5, name: "Loading Icon", gif: LoadingGif, link:"", description:""},
-        {id: 6, name: "Don't Die", gif: DontDieGif, link:"", description:""},
-        {id: 7, name: "Resume", gif: ResumeGif, link:"", description:""}
+        { id: 1, name: "Rush Hour", gif: RushHourGif, route: "/projects/rushhour", description:""},
+        {id: 2, name: "Punch-In", gif: PunchInGif, route: "/projects/punch-in", description:"" },
+        {id: 3, name: "About Mii", gif: AboutMiiGif, route: "/projects/about", description:""},
+        {id: 4, name: "Slider", gif: SliderGif, route: "/projects/slider", description:""},
+        {id: 5, name: "Loading Icon", gif: LoadingGif, route: "/projects/loadingicon", description:""},
+        {id: 6, name: "Don't Die", gif: DontDieGif, route: "/projects/dontdie", description:""},
+        {id: 7, name: "Resume", gif: ResumeGif, route: "/projects/resume", description:""},
+        { id: 8, name: "3D Western", gif: RushHourGif, route: "/projects/3dwestern", description: "A club website rebuilt around..." },
     ];
 
-    // 2. Create a full list of 24
-  // We map from 0 to 23. If a real app exists at that index, use it.
-  // Otherwise, create a placeholder object.
-  const allApps = Array.from({ length: 24 }, (_, i) => {
+    const allApps = Array.from({ length: 24 }, (_, i) => {
     return realApps[i] || { 
       id: i + 1, 
-      name: "Coming Soon", 
-      gif: null // No GIF for placeholders
+      name: "Coming Soon",
+      gif: null
     };
   });
 
     let selectedAppIndex = -1;
 
     function openPopup(index) {
-        //Only open if not placeholder
-        if(allApps[index].name !== "Coming Soon") selectedAppIndex = index;
+        if(allApps[index].name !== "Coming Soon") {
+            playSound(selectSfx, 0.5);
+            playSound(openSfx, 0.5);
+            selectedAppIndex = index;
+        }
     }
 
     function closePopup() {
@@ -47,7 +51,6 @@
 
     function nextPopupApp() {
         if (selectedAppIndex !== -1) {
-            // arithmetic to wrap around to 0 at end
             selectedAppIndex = (selectedAppIndex + 1) % allApps.length;
         }
     }

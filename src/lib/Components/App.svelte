@@ -1,8 +1,11 @@
 <script>
+    import { playSound } from '$lib/sound.js';
+    import hoverSfx from '$lib/assets/sfx/Hover.wav';
+
     export let appData;
 </script>
 
-<div class="app-wrapper" on:click>
+<div class="app-wrapper" on:click on:mouseenter={() => playSound(hoverSfx, 0.35)}>
     <div class="app-card" class:is-placeholder={!appData.gif}>
         {#if appData.gif}
             <img src={appData.gif} alt={appData.name} class="app-gif" loading="lazy" />
@@ -37,7 +40,6 @@
         transition: box-shadow 0.9s ease;
         transition: border-color 0.4s ease;
         overflow: hidden;
-
     }
 
     .app-wrapper:hover .app-card {
