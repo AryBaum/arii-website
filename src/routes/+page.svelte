@@ -5,6 +5,7 @@
 	import Grid from "$lib/Components/Grid.svelte";
 	import ControlPanel from "$lib/Components/ControlPanel.svelte";
 	import MailModal from "$lib/Components/MailModal.svelte";
+	import Intro from "$lib/Components/Intro.svelte";
 	import { computeLayout } from '$lib/wiiLayout.js';
 
 	let showControlPanel = false;
@@ -54,6 +55,9 @@
   {#if showMail}
     <MailModal on:close={() => showMail = false} />
   {/if}
+
+  <!-- Skeleton loader + warning screen, once per visit -->
+  <Intro {layout} />
 </div>
 
 <style>

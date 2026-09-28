@@ -1,6 +1,8 @@
 <script>
     import '../app.css';
     import { onMount } from 'svelte';
+    import { get } from 'svelte/store';
+    import { introActive } from '$lib/stores.js';
     import { fade } from 'svelte/transition';
     import { page } from '$app/stores';
     import { afterNavigate } from '$app/navigation';
@@ -22,7 +24,9 @@
     onMount(() => {
         preloadSounds(Object.values(sfx));
 
+        // Pages without the intro start the boot music on the first click/tap
         const startOnInteract = () => {
+            if (get(introActive)) return;
             initBootSequence(StartSfx, MenuSfx);
             window.removeEventListener('pointerdown', startOnInteract);
         };

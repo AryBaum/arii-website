@@ -15,6 +15,10 @@ function readMuted() {
 // Remembered across visits, so people who turned the sound off don't get the jingle again
 export const muted = writable(readMuted());
 
+// True while the startup intro (skeleton + warning screen) is on screen.
+// The intro starts the boot music itself when it finishes.
+export const introActive = writable(false);
+
 if (browser) {
     muted.subscribe((value) => {
         try {
