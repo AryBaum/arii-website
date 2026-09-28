@@ -7,3 +7,34 @@
   font-style: normal;
   font-display: swap;
 }
+
+/* Wii palette — use these instead of hard-coding hex values */
+:root {
+  --wii-blue: #58cdf8;
+  --wii-blue-dark: #43bbe5;
+  --wii-blue-soft: #e0f5fd;
+  --wii-glow: rgba(88, 205, 248, 0.5);
+  --wii-grey-text: #747474;
+  --wii-page-bg: hsl(220, 14%, 96%);
+  --wii-stripes: repeating-linear-gradient(0deg, #ededed, #ededed 3px, #e6e6e6 3px, #e6e6e6 6px);
+
+  /* The site always looks like the Wii, even when the OS is in dark mode */
+  color-scheme: only light;
+}
+
+html {
+  background-color: var(--wii-page-bg);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  color: #4a4a4a;
+  background-color: var(--wii-page-bg);
+  font-family: "Continuum", sans-serif;
+}
+
+/* Only the Wii Menu locks scrolling; +page.svelte adds/removes this class */
+body.no-scroll {
+  overflow: hidden;
+}

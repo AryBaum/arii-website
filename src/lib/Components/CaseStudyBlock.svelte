@@ -1,9 +1,12 @@
 <script>
+    /** @type {any} */
     export let block;
 
+    /** @param {Event} e */
     function handleImgError(e) {
-        e.target.src = '/placeholder.png';
-        e.target.classList.add('img-missing');
+        const img = /** @type {HTMLImageElement} */ (e.currentTarget);
+        img.src = '/placeholder.png';
+        img.classList.add('img-missing');
     }
 </script>
 
@@ -102,7 +105,7 @@
     }
 
     .block-quote {
-        border-left: 4px solid #58cdf8;
+        border-left: 4px solid var(--wii-blue);
         padding: 4px 20px;
         margin: 0 0 24px;
         color: #444;
@@ -137,7 +140,7 @@
 
     .dot {
         display: inline-block;
-        color: #58cdf8;
+        color: var(--wii-blue);
         font-weight: bold;
         font-size: 0.75rem;
         text-transform: uppercase;

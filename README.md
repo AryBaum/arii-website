@@ -1,38 +1,41 @@
-# sv
+# Arii — Wii Menu portfolio
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+My portfolio, built to feel like turning on a Nintendo Wii: projects are channels on the Wii Menu, each with a looping preview, a channel popup, and a case study behind the **Start** button.
 
-## Creating a project
+Built with SvelteKit and deployed on Vercel.
 
-If you're seeing this, you've probably already done this step. Congrats!
-
-```sh
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## Running it
 
 ```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+npm install
+npm run dev      # dev server (also reachable from your phone on the same Wi-Fi)
+npm run check    # type check
+npm run build    # production build
 ```
 
-## Building
+## Where things live
 
-To create a production version of your app:
+| What | Where |
+| --- | --- |
+| Every channel (name, preview, description, case study) | `src/lib/data/projects.js` |
+| Example case study showing every block type | `src/lib/data/caseStudyTemplate.js` (preview at `/projects/template`) |
+| Wii Menu grid + paging | `src/lib/Components/Grid.svelte` |
+| Channel popup (Arii Menu / Details / Start) | `src/lib/Components/Popup.svelte` |
+| Footer clock + Arii / Mail buttons | `src/lib/Components/Footer.svelte` |
+| Case study page | `src/routes/projects/[slug]/+page.svelte` |
+| Sounds + boot music | `src/lib/sound.js`, `src/lib/assets/sfx/` |
+| Wii colours | CSS variables at the top of `src/app.css` |
 
-```sh
-npm run build
-```
+## Adding a channel
 
-You can preview the production build with `npm run preview`.
+1. Record a short clip of the project and convert it to a small looping MP4 plus a poster frame
+   (keep previews under ~1 MB — GIFs are 10–100× bigger for the same clip):
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+   ```sh
+   ffmpeg -i clip.gif -movflags +faststart -an -c:v libx264 -crf 26 -pix_fmt yuv420p \
+     -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2,fps=20" src/lib/assets/channels/MyProject.mp4
+   ffmpeg -i clip.gif -frames:v 1 -q:v 4 src/lib/assets/channels/MyProject.jpg
+   ```
+
+2. Import both in `projects.js` and add an entry with `slug`, `name`, `preview` and `description`.
+3. Add `sections` (copy from the template) when the case study is ready. Until then, Start shows "coming soon".

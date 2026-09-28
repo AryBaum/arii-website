@@ -2,6 +2,8 @@
     import { createEventDispatcher } from 'svelte';
     import { fly } from 'svelte/transition';
     import { muted } from '$lib/stores.js';
+    import { modal } from '$lib/actions/modal.js';
+    import { launchTo } from '$lib/transitions.js';
 
     const dispatch = createEventDispatcher();
     const close = () => dispatch('close');
@@ -9,18 +11,18 @@
     const toggleMute = () => muted.update(m => !m);
 </script>
 
-<div class="backdrop" on:click|self={close}>
-    <div class="panel">
+<div class="backdrop" role="presentation" on:click|self={close}>
+    <div class="panel" use:modal={{ onClose: close }} aria-label="Quick access" transition:fly={{ y: 40, duration: 250 }}>
         <div class="panel-header">
-            <img src="AriiLogo.png" alt="Arii" class="mii-icon" />
+            <img src="/AriiLogo.png" alt="Arii" class="mii-icon" />
             <h2>Quick Access</h2>
         </div>
 
         <div class="links">
-            <a href="/resume.pdf" target="_blank" class="link-row">📄 Download Resume</a>
-            <a href="https://github.com/YOUR_USERNAME" target="_blank" class="link-row">💻 GitHub</a>
-            <a href="https://linkedin.com/in/YOUR_USERNAME" target="_blank" class="link-row">🔗 LinkedIn</a>
-            <button class="link-row" on:click={toggleMute}>
+            <a href="/resume" class="link-row" on:click|preventDefault={() => launchTo('/resume')}>📄 Resume</a>
+            <a href="https://github.com/AryBaum" target="_blank" rel="noopener" class="link-row">💻 GitHub</a>
+            <a href="https://linkedin.com/in/arielle-tetelbaum" target="_blank" rel="noopener" class="link-row">🔗 LinkedIn</a>
+            <button class="link-row" on:click={toggleMute} aria-pressed={$muted}>
                 {$muted ? '🔇 Sound Off' : '🔊 Sound On'}
             </button>
         </div>
@@ -33,21 +35,24 @@
     .backdrop {
         position: fixed;
         top: 0; left: 0;
-        width: 100vw; height: 100vh;
+        width: 100%; height: 100%;
+        box-sizing: border-box;
         background: rgba(0, 0, 0, 0.6);
         z-index: 9999;
         display: flex;
         justify-content: center;
-        align-items: flex-end;
-        padding-bottom: 22vh;
+        align-items: center;
+        padding: 16px;
     }
 
     .panel {
-        width: 320px;
+        width: 100%;
+        max-width: 320px;
+        outline: none;
         background: white;
         border-radius: 20px;
-        border: 3px solid #58cdf8;
-        box-shadow: 0 0 20px rgba(88, 205, 248, 0.5);
+        border: 3px solid var(--wii-blue);
+        box-shadow: 0 0 20px var(--wii-glow);
         padding: 20px;
         box-sizing: border-box;
         text-align: center;
@@ -94,17 +99,17 @@
     }
 
     .link-row:hover {
-        background: #e0f5fd;
+        background: var(--wii-blue-soft);
     }
 
     .close-btn {
         width: 100%;
         padding: 10px;
         border-radius: 30px;
-        border: 2px solid #48c5f3;
+        border: 2px solid var(--wii-blue-dark);
         background: white;
         font-weight: bold;
-        color: #747474;
+        color: var(--wii-grey-text);
         cursor: pointer;
     }
 </style>

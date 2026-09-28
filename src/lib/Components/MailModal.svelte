@@ -1,6 +1,7 @@
 <script>
     import { createEventDispatcher } from 'svelte';
     import { fly } from 'svelte/transition';
+    import { modal } from '$lib/actions/modal.js';
 
     const dispatch = createEventDispatcher();
     const close = () => dispatch('close');
@@ -15,7 +16,7 @@
         sending = true;
         // Swap this endpoint for Formspree / Web3Forms / your own API route
         try {
-            const res = await fetch('https://formspree.io/f/YOUR_FORM_ID', {
+            const res = await fetch('https://formspree.io/f/mvkpwdvr', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
                 body: JSON.stringify({ name, email, message })
@@ -29,11 +30,11 @@
     }
 </script>
 
-<div class="backdrop" on:click|self={close}>
-    <div class="envelope" transition:fly={{ y: 40, duration: 300 }}>
+<div class="backdrop" role="presentation" on:click|self={close}>
+    <div class="envelope" use:modal={{ onClose: close }} aria-label="Send me a message" transition:fly={{ y: 40, duration: 300 }}>
         <div class="header">
             <h2>Send Mii a Message</h2>
-            <button class="close-x" on:click={close}>✕</button>
+            <button class="close-x" on:click={close} aria-label="Close">✕</button>
         </div>
 
         {#if sent}
@@ -52,7 +53,7 @@
             </form>
 
             <div class="direct-links">
-                <a href="mailto:you@example.com">or email me directly</a>
+                <a href="mailto:atetelba@uwo.ca">or email me directly</a>
             </div>
         {/if}
     </div>
@@ -62,7 +63,9 @@
     .backdrop {
         position: fixed;
         top: 0; left: 0;
-        width: 100vw; height: 100vh;
+        width: 100%; height: 100%;
+        padding: 16px;
+        box-sizing: border-box;
         background: rgba(0, 0, 0, 0.7);
         z-index: 9999;
         display: flex;
@@ -75,10 +78,13 @@
         max-width: 420px;
         background: white;
         border-radius: 16px;
-        border: 3px solid #58cdf8;
-        box-shadow: 0 0 20px rgba(88, 205, 248, 0.5);
+        border: 3px solid var(--wii-blue);
+        box-shadow: 0 0 20px var(--wii-glow);
         padding: 24px;
         box-sizing: border-box;
+        max-height: 100%;
+        overflow-y: auto;
+        outline: none;
     }
 
     .header {
@@ -97,9 +103,22 @@
     .close-x {
         background: none;
         border: none;
-        font-size: 1.2rem;
+        font-size: 1.4rem;
+        font-weight: bold;
         color: #999;
         cursor: pointer;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: background 0.15s, color 0.15s;
+    }
+
+    .close-x:hover {
+        background: #f0f0f0;
+        color: var(--wii-blue);
     }
 
     form {
@@ -119,15 +138,15 @@
 
     input:focus, textarea:focus {
         outline: none;
-        border-color: #58cdf8;
+        border-color: var(--wii-blue);
     }
 
     .send-btn {
         margin-top: 6px;
         padding: 10px;
         border-radius: 30px;
-        border: 2px solid #48c5f3;
-        background: #58cdf8;
+        border: 2px solid var(--wii-blue-dark);
+        background: var(--wii-blue);
         color: white;
         font-weight: bold;
         cursor: pointer;
@@ -149,7 +168,7 @@
     }
 
     .direct-links a {
-        color: #58cdf8;
+        color: var(--wii-blue);
         font-size: 0.9rem;
         text-decoration: none;
     }
@@ -162,7 +181,7 @@
 
     .stamp {
         font-size: 2.5rem;
-        color: #58cdf8;
+        color: var(--wii-blue);
         margin: 0 0 10px;
     }
 </style>

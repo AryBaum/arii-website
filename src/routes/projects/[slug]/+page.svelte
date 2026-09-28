@@ -1,5 +1,5 @@
 <script>
-    import { goto } from '$app/navigation';
+    import { launchTo } from '$lib/transitions.js';
     import { playSound } from '$lib/sound.js';
     import footerSfx from '$lib/assets/sfx/Footer.wav';
     import CaseStudyBlock from '$lib/Components/CaseStudyBlock.svelte';
@@ -11,12 +11,13 @@
 
     const backToMenu = () => {
         playSound(footerSfx, 0.5);
-        goto('/');
+        launchTo('/');
     };
 
+    /** @param {string} slug */
     const goToProject = (slug) => {
         playSound(footerSfx, 0.5);
-        goto(`/projects/${slug}`);
+        launchTo(`/projects/${slug}`);
     };
 </script>
 
@@ -30,7 +31,8 @@
         <button on:click={backToMenu}>&lt; Back to Arii Menu</button>
     </div>
 {:else}
-    <div class="case-study">
+    {#key project.slug}
+    <div class="case-study channel-in">
         <div class="breadcrumb">
             <button on:click={backToMenu}>&lt; Arii Menu</button>
             <span class="crumb-sep">/</span>
@@ -42,7 +44,7 @@
                 <img
                     src={project.coverImage}
                     alt={project.name}
-                    on:error={(e) => e.target.src = '/placeholder.png'}
+                    on:error={(e) => (/** @type {HTMLImageElement} */ (e.currentTarget).src = '/placeholder.png')}
                 />
             </div>
             <div class="hero-info">
@@ -52,7 +54,9 @@
                 <div class="facts">
                     <div class="fact"><span class="label">Role</span><span>{project.role}</span></div>
                     <div class="fact"><span class="label">Timeline</span><span>{project.timeline}</span></div>
-                    <div class="fact"><span class="label">Tools</span><span>{project.tools.join(', ')}</span></div>
+                    {#if project.tools?.length}
+                        <div class="fact"><span class="label">Tools</span><span>{project.tools.join(', ')}</span></div>
+                    {/if}
                     {#if project.liveLink}
                         <a href={project.liveLink} target="_blank" class="live-link">View Live Site &#8594;</a>
                     {/if}
@@ -85,6 +89,7 @@
             {:else}<div></div>{/if}
         </div>
     </div>
+    {/key}
 {/if}
 
 <style>
@@ -99,7 +104,7 @@
     }
 
     .not-found button {
-        background: #58cdf8;
+        background: var(--wii-blue);
         color: white;
         border: none;
         border-radius: 30px;
@@ -116,6 +121,20 @@
         font-family: "Continuum", sans-serif;
     }
 
+    .channel-in {
+        animation: channel-in 0.6s cubic-bezier(0.22, 0.8, 0.3, 1) both;
+    }
+
+    /* "Channel boot": content settles in as the white flash fades */
+    @keyframes channel-in {
+        from { opacity: 0; transform: translateY(14px) scale(0.985); }
+        to { opacity: 1; transform: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .channel-in { animation: none; }
+    }
+
     .breadcrumb {
         display: flex;
         align-items: center;
@@ -128,7 +147,7 @@
     .breadcrumb button {
         background: none;
         border: none;
-        color: #58cdf8;
+        color: var(--wii-blue);
         font-weight: bold;
         cursor: pointer;
         font-size: 0.95rem;
@@ -194,7 +213,7 @@
     }
 
     .fact .label {
-        color: #58cdf8;
+        color: var(--wii-blue);
         font-weight: bold;
         font-size: 0.75rem;
         text-transform: uppercase;
@@ -204,7 +223,7 @@
     .live-link {
         margin-top: 10px;
         color: white;
-        background: #58cdf8;
+        background: var(--wii-blue);
         text-decoration: none;
         text-align: center;
         padding: 10px;
@@ -227,7 +246,7 @@
     .block-section h2 {
         font-size: 1.4rem;
         color: #333;
-        border-left: 4px solid #58cdf8;
+        border-left: 4px solid var(--wii-blue);
         padding-left: 12px;
         margin-bottom: 18px;
     }
@@ -252,11 +271,11 @@
     }
 
     .nav-project:hover {
-        border-color: #58cdf8;
+        border-color: var(--wii-blue);
     }
 
     .back-btn {
-        background: #58cdf8;
+        background: var(--wii-blue);
         color: white;
         border: none;
         border-radius: 30px;
