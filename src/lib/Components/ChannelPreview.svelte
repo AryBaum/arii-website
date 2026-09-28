@@ -1,5 +1,6 @@
 <script>
     import { onMount } from 'svelte';
+    import { introActive } from '$lib/stores.js';
 
     /** @type {{ video: string, poster: string }} */
     export let preview;
@@ -7,14 +8,20 @@
     /** "cover" fills the tile, "contain" shows the whole clip (popup) */
     export let fit = 'cover';
 
-    // People who ask their OS for less motion just see the still poster frame
+    // Show the still poster frame until the page is running and the startup
+    // intro is over — loading 8 videos behind the intro makes its animation stutter.
+    // People who ask their OS for less motion only ever see the poster.
+    let mounted = false;
     let reduceMotion = false;
     onMount(() => {
         reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        mounted = true;
     });
+
+    $: playVideo = mounted && !reduceMotion && !$introActive;
 </script>
 
-{#if reduceMotion}
+{#if !playVideo}
     <img src={preview.poster} {alt} class="media" style:object-fit={fit} />
 {:else}
     <video

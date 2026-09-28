@@ -87,6 +87,8 @@ function ensureBootAudio(startSrc, menuSrc) {
  * @param {string} menuSrc
  */
 export function primeAudio(startSrc, menuSrc) {
+    // Already playing — priming again would pause and rewind the music
+    if (booted) return;
     try {
         const ctx = getContext();
         if (ctx.state === 'suspended') ctx.resume();
@@ -95,6 +97,7 @@ export function primeAudio(startSrc, menuSrc) {
     }
     const { startAudio, musicAudio } = ensureBootAudio(startSrc, menuSrc);
     for (const el of [startAudio, musicAudio]) {
+        if (!el.paused) continue;
         const wasMuted = el.muted;
         el.muted = true;
         el.play()

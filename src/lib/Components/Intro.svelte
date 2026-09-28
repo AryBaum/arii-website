@@ -1,6 +1,5 @@
 <script>
-    import { onMount } from 'svelte';
-    import { fade } from 'svelte/transition';
+    import { onMount, tick } from 'svelte';
     import { introActive } from '$lib/stores.js';
     import { primeAudio, initBootSequence } from '$lib/sound.js';
     import { prefersReducedMotion } from '$lib/transitions.js';
@@ -21,6 +20,7 @@
     const TILE_CYCLE = 2000;      // each skeleton tile fades in, holds, fades out
     const DIAGONAL_STEP = 90;     // delay between diagonals (top-left lights up first)
     const CYCLE_GAP = 350;        // moment of black between skeleton loops
+    const SETTLE = 400;           // black before the first loop, while the page finishes loading
     const MAX_CYCLES = 3;         // keep looping while the channels load, up to this many
     const WARNING_FADE_OUT = 900;
     const BLACK_HOLD = 700;
@@ -29,6 +29,7 @@
     /** @type {'skeleton' | 'warning' | 'leaving' | 'revealing'} */
     let phase = 'skeleton';
     let cycle = 0;
+    let skeletonStarted = false;
     let visible = true;
     let isTouch = false;
     let cancelled = false;
@@ -37,8 +38,25 @@
     $: rows = layout?.rows ?? 3;
     $: lastDiagonal = cols - 1 + rows - 1;
 
+    // Seen this visit? app.html only checks on a full page load, so we also check
+    // here — otherwise coming back to the menu from a case study replays the intro.
+    function alreadySeen() {
+        if (document.documentElement.classList.contains('intro-seen')) return true;
+        try {
+            return sessionStorage.getItem(SEEN_KEY) === '1';
+        } catch {
+            return false;
+        }
+    }
+
     /** @param {number} ms */
     const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+    // Resolves on the next painted frame, with a short fallback so the intro can
+    // never get stuck on black if the browser skips frames
+    const nextFrame = () => new Promise((r) => {
+        requestAnimationFrame(() => r(undefined));
+        setTimeout(() => r(undefined), 100);
+    });
 
     // Load the channel poster images (and the font) behind the skeleton,
     // so the menu is ready when it appears
@@ -54,7 +72,7 @@
 
     onMount(() => {
         // Already seen this visit (app.html hides it before paint)
-        if (document.documentElement.classList.contains('intro-seen')) {
+        if (alreadySeen()) {
             visible = false;
             return;
         }
@@ -76,6 +94,16 @@
         if (prefersReducedMotion()) {
             await loading;
         } else {
+            // Let the page finish its first render before animating, otherwise the
+            // browser drops the first frames and the sweep appears to start midway
+            while (!layout) await nextFrame();
+            await nextFrame();
+            await nextFrame();
+            await wait(SETTLE);
+            if (cancelled) return;
+            skeletonStarted = true;
+            await tick();
+
             for (cycle = 0; cycle < MAX_CYCLES; cycle++) {
                 await wait(TILE_CYCLE + lastDiagonal * DIAGONAL_STEP + CYCLE_GAP);
                 if (cancelled || phase !== 'skeleton') return;
@@ -103,12 +131,16 @@
         }
 
         await wait(WARNING_FADE_OUT + BLACK_HOLD);
+        // The menu fades in from black and the jingle starts with it
         phase = 'revealing';
         initBootSequence(StartSfx, MenuSfx);
 
         await wait(MENU_FADE_IN);
         visible = false;
         introActive.set(false);
+        // Only now mark it seen on the page itself: that class hides the intro
+        // instantly, so adding it earlier would cut the fades short
+        document.documentElement.classList.add('intro-seen');
     }
 
     /** @param {KeyboardEvent} e */
@@ -136,7 +168,7 @@
         tabindex="-1"
         on:click={continueToMenu}
     >
-        {#if phase === 'skeleton' && layout}
+        {#if phase === 'skeleton' && layout && skeletonStarted}
             {#key cycle}
                 <div
                     class="skeleton"
@@ -161,7 +193,7 @@
         {/if}
 
         {#if phase === 'warning' || phase === 'leaving'}
-            <div class="warning" class:leaving={phase === 'leaving'} style:--warning-fade="{WARNING_FADE_OUT}ms" in:fade={{ duration: 600 }}>
+            <div class="warning" class:leaving={phase === 'leaving'} style:--warning-fade="{WARNING_FADE_OUT}ms">
                 <h1>
                     <svg class="warn-icon" viewBox="0 0 24 22" aria-hidden="true">
                         <path d="M12 1.5 23 20.5H1Z" fill="#f7c600" stroke="#f7c600" stroke-width="1.5" stroke-linejoin="round" />
@@ -216,6 +248,7 @@
 
     .ghost {
         container-type: inline-size;
+        will-change: opacity;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -259,11 +292,17 @@
         justify-content: center;
         padding: 24px;
         box-sizing: border-box;
+        /* Plain CSS (not a Svelte transition) so it can't get stuck if the browser is busy */
+        animation: warning-in 600ms ease backwards;
         transition: opacity var(--warning-fade) ease;
     }
 
     .warning.leaving {
         opacity: 0;
+    }
+
+    @keyframes warning-in {
+        from { opacity: 0; }
     }
 
     h1 {
