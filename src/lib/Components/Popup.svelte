@@ -96,7 +96,7 @@
                 <div class="details-overlay" transition:fly={{ y: 60, duration: 250 }}>
                     <h3>{app.name}</h3>
                     {#if app.role || app.timeline}
-                        <p class="meta">{app.role ?? ''}{#if app.role && app.timeline} · {/if}{app.timeline ?? ''}</p>
+                        <p class="meta">{app.role ?? ''}{#if app.role && app.timeline}{' · '}{/if}{app.timeline ?? ''}</p>
                     {/if}
                     <p class="desc">{app.description || "Details coming soon."}</p>
                     {#if app.techStack?.length}

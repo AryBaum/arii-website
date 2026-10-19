@@ -13,14 +13,22 @@
 {#if block.type === "text"}
     <p class="block-text">{block.content}</p>
 
+{:else if block.type === "subheading"}
+    <h3 class="block-subheading">{block.content}</h3>
+
+{:else if block.type === "list"}
+    <ul class="block-list">
+        {#each block.items as item}<li>{item}</li>{/each}
+    </ul>
+
 {:else if block.type === "image"}
-    <figure class="block-image">
+    <figure class="block-image" class:narrow={block.narrow}>
         <img src={block.src} alt={block.caption || ""} loading="lazy" on:error={handleImgError} />
         {#if block.caption}<figcaption>{block.caption}</figcaption>{/if}
     </figure>
 
 {:else if block.type === "imageRow"}
-    <div class="block-image-row">
+    <div class="block-image-row" class:compact={block.compact}>
         {#each block.images as img}
             <figure>
                 <img src={img.src} alt={img.caption || ""} loading="lazy" on:error={handleImgError} />
@@ -51,10 +59,41 @@
         color: #555;
         font-size: 1rem;
         margin: 0 0 20px;
+        white-space: pre-line;
+    }
+
+    .block-subheading {
+        font-size: 1.1rem;
+        color: #333;
+        margin: 28px 0 8px;
+    }
+
+    .block-list {
+        line-height: 1.6;
+        color: #555;
+        font-size: 1rem;
+        margin: 0 0 20px;
+        padding-left: 22px;
+        list-style: disc;
+    }
+
+    .block-list li {
+        margin-bottom: 8px;
+    }
+
+    .block-list li::marker {
+        color: var(--wii-blue);
     }
 
     .block-image {
         margin: 0 0 24px;
+    }
+
+    /* Tall images (e.g. portrait sketches) shouldn't fill the whole column */
+    .block-image.narrow {
+        max-width: 520px;
+        margin-left: auto;
+        margin-right: auto;
     }
 
     .block-image img {
@@ -64,7 +103,7 @@
         display: block;
         min-height: 160px;
         background: #f4f4f4;
-        object-fit: cover;
+        object-fit: contain;
     }
 
     .block-image figcaption {
@@ -79,7 +118,14 @@
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 16px;
+        align-items: start;
         margin: 0 0 24px;
+    }
+
+    /* Phone screens: keep each one phone-sized instead of stretching to fill the row */
+    .block-image-row.compact {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 260px));
+        justify-content: center;
     }
 
     .block-image-row img {
@@ -89,7 +135,7 @@
         display: block;
         min-height: 160px;
         background: #f4f4f4;
-        object-fit: cover;
+        object-fit: contain;
     }
 
     .block-image-row figcaption {

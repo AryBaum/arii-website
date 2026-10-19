@@ -1,4 +1,4 @@
-// Reference case study showing every block type (text, image, imageRow, quote, decision).
+// Reference case study showing every block type (text, subheading, list, image, imageRow, quote, decision).
 // Copy a section from here into projects.js when writing a new case study.
 // It isn't shown on the Wii Menu, but you can preview it at /projects/template.
 export const caseStudyTemplate = {
