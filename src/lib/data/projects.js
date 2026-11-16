@@ -33,7 +33,8 @@ export const projects = [
         slug: "about",
         name: "About Mii",
         preview: { video: AboutMiiVid, poster: AboutMiiPoster },
-        description: ""
+        description: "Who I am, how I found UI/UX design, and how to reach me.",
+        route: "/about"
     },
     {
         slug: "resume",
